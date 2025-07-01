@@ -23,9 +23,45 @@ export const addCamera = async (req, res) => {
 
 export const getCameras = async (req, res) => {
   try {
-    const cameras = await Camera.find();
+    const { cameraType, startDate, endDate, page, limit = 10 } = req.query;
 
-    return res.status(201).json(cameras);
+    const filter = {};
+
+    if (cameraType && cameraType !== "all") {
+      filter.cameraType = cameraType;
+    }
+
+    if (startDate && endDate) {
+      filter.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    let cameras;
+
+    if (!page) {
+      // Asosiy query
+      cameras = await Camera.find(filter).sort({ createdAt: -1 }); // oxirgilar birinchi
+    } else {
+      // Asosiy query
+      cameras = await Camera.find(filter)
+        .sort({ createdAt: -1 }) // oxirgilar birinchi
+        .skip(skip)
+        .limit(parseInt(limit));
+    }
+
+    // Umumiy soni (pagination uchun foydali)
+    const total = await Camera.countDocuments(filter);
+
+    res.status(200).json({
+      data: cameras,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(total / limit),
+      totalItems: total,
+    });
   } catch (err) {
     res.status(500).json({
       message: "Server error",
