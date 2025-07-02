@@ -69,3 +69,37 @@ export const getCameras = async (req, res) => {
     });
   }
 };
+
+export const editCamera = async (req, res) => {
+  try {
+    const { cameraType, address, longitude, latitude } = req.body;
+
+    console.log(req.body);
+
+    await Camera.findByIdAndUpdate(req.params.id, {
+      cameraType,
+      address,
+      position: [longitude, latitude],
+    });
+
+    res.status(200).json("Camera updated");
+  } catch (err) {
+    res.status(500).json({
+      message: "Server error",
+      error: err,
+    });
+  }
+};
+
+export const deleteCamera = async (req, res) => {
+  try {
+    await Camera.findByIdAndDelete(req.params.id);
+
+    res.status(200).json("Camera deleted");
+  } catch (err) {
+    res.status(500).json({
+      message: "Server error",
+      error: err,
+    });
+  }
+};

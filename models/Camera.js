@@ -5,7 +5,7 @@ const cameraSchema = new mongoose.Schema(
     cameraType: {
       type: String,
       required: true,
-      enum: ["ptz", "radar", "lis"],
+      enum: ["ptz", "radar", "lis", "avto", "obz"],
     },
     address: {
       type: String,
