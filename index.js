@@ -1,27 +1,33 @@
 import express from "express";
-import mongoose from "mongoose";
-import cameraRouter from "./routes/cameras.js";
+import connectDB from "./config/db.js";
+import cookieParser from "cookie-parser";
 import cors from "cors";
+import dotenv from "dotenv";
+import { errorHandler } from "./middlewares/error.middleware.js";
+import authRoutes from "./routes/auth.routes.js";
+import camerasRoutes from "./routes/cameras.js";
+
+dotenv.config();
+connectDB();
 
 const app = express();
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect("mongodb://0.0.0.0/iivcamera");
+app.use("/api/auth", authRoutes);
+app.use("/api/cameras", camerasRoutes);
 
-    console.log("MongoDB connected...");
-  } catch (err) {
-    console.log(err);
-  }
-};
+app.use(errorHandler);
 
-connectDB();
+const PORT = process.env.PORT || 5000;
 
-app.use("/api/cameras", cameraRouter);
-
-app.listen(5000, () => {
-  console.log("Server is running on port 5000...");
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}...`);
 });
