@@ -15,7 +15,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "iivcamera.netlify.app",
+    origin: "https://iivcamera.netlify.app",
     credentials: true,
   })
 );
