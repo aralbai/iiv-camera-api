@@ -95,7 +95,7 @@ export const login = async (req, res, next) => {
     // 6. Set the refresh token to httpOnly cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -118,7 +118,7 @@ export const login = async (req, res, next) => {
 export const logout = (req, res) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: false,
+    secure: true,
     sameSite: "none",
   });
 
