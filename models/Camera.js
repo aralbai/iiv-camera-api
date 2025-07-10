@@ -7,8 +7,13 @@ const cameraSchema = new mongoose.Schema(
       required: true,
       enum: ["ptz", "radar", "lis", "avto", "obz"],
     },
-    address: {
+    district: {
       type: String,
+      required: true,
+    },
+    mahalla: {
+      type: String,
+      required: true,
     },
     position: {
       type: [Number],

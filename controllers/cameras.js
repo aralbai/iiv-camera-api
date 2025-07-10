@@ -1,12 +1,50 @@
 import Camera from "../models/Camera.js";
+import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
+
+import { readFile } from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// __dirname va __filename olish
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Fayl yo‘li
+const filePath = path.join(__dirname, "../data/qoraqalpogiston.geojson");
+
+// Faylni o‘qib, JSON qilib olish
+const fileContent = await readFile(filePath, "utf-8");
+const geojson = JSON.parse(fileContent);
 
 export const addCamera = async (req, res) => {
   try {
-    const { cameraType, address, longitude, latitude } = req.body;
+    const { cameraType, longitude, latitude } = req.body;
+
+    if (!longitude || !latitude) {
+      return res.status(400).json("Необходимы координаты.");
+    }
+
+    const point = {
+      type: "Point",
+      coordinates: [longitude, latitude],
+    };
+
+    const foundMahalla = geojson.features.find((feature) =>
+      booleanPointInPolygon(point, feature)
+    );
+
+    if (!foundMahalla) {
+      return res.status(400).json("МПЖ не найден");
+    }
+
+    const { district, mahalla_no } = foundMahalla.properties;
+
+    console.log(district, mahalla_no);
 
     const newCamera = new Camera({
       cameraType,
-      address,
+      district,
+      mahalla: mahalla_no,
       position: [longitude, latitude],
     });
 
@@ -23,12 +61,28 @@ export const addCamera = async (req, res) => {
 
 export const getCameras = async (req, res) => {
   try {
-    const { cameraType, startDate, endDate, page, limit = 10 } = req.query;
+    const {
+      cameraType,
+      district,
+      mahalla,
+      startDate,
+      endDate,
+      page,
+      limit = 10,
+    } = req.query;
 
     const filter = {};
 
     if (cameraType && cameraType !== "all") {
       filter.cameraType = cameraType;
+    }
+
+    if (district && district !== "all") {
+      filter.district = district;
+    }
+
+    if (mahalla && mahalla !== "all") {
+      filter.mahalla = mahalla;
     }
 
     if (startDate && endDate) {
@@ -69,15 +123,36 @@ export const getCameras = async (req, res) => {
 
 export const editCamera = async (req, res) => {
   try {
-    const { cameraType, address, longitude, latitude } = req.body;
+    const { id } = req.params;
+    const { cameraType, longitude, latitude } = req.body;
 
-    console.log(req.body);
+    if (!longitude || !latitude) {
+      return res.status(400).json("Необходимы координаты.");
+    }
 
-    await Camera.findByIdAndUpdate(req.params.id, {
+    const point = {
+      type: "Point",
+      coordinates: [longitude, latitude],
+    };
+
+    const foundMahalla = geojson.features.find((feature) =>
+      booleanPointInPolygon(point, feature)
+    );
+
+    if (!foundMahalla) {
+      return res.status(400).json("МПЖ не найден");
+    }
+
+    const { district, mahalla_no } = foundMahalla.properties;
+
+    const newData = {
       cameraType,
-      address,
+      district,
+      mahalla: mahalla_no,
       position: [longitude, latitude],
-    });
+    };
+
+    await Camera.findByIdAndUpdate(id, newData);
 
     res.status(200).json({
       message: "Камера успешно обновлена",
