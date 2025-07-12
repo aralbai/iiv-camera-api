@@ -39,8 +39,6 @@ export const addCamera = async (req, res) => {
 
     const { district, mahalla_no } = foundMahalla.properties;
 
-    console.log(district, mahalla_no);
-
     const newCamera = new Camera({
       cameraType,
       district,
