@@ -25,6 +25,9 @@ const cameraSchema = new mongoose.Schema(
         message: "Position must be [longitude, latitude]",
       },
     },
+    ip: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

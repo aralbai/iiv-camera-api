@@ -163,6 +163,28 @@ export const editCamera = async (req, res) => {
   }
 };
 
+export const editCameraIP = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { ip } = req.body;
+
+    const newData = {
+      ip,
+    };
+
+    await Camera.findByIdAndUpdate(id, newData);
+
+    res.status(200).json({
+      message: "Камера успешно обновлена",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Ошибка сервера",
+      error: err,
+    });
+  }
+};
+
 export const deleteCamera = async (req, res) => {
   try {
     await Camera.findByIdAndDelete(req.params.id);

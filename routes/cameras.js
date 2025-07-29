@@ -3,6 +3,7 @@ import {
   addCamera,
   deleteCamera,
   editCamera,
+  editCameraIP,
   getCameras,
 } from "../controllers/cameras.js";
 
@@ -13,6 +14,8 @@ router.post("/", addCamera);
 router.get("/", getCameras);
 
 router.put("/:id", editCamera);
+
+router.put("/ip/:id", editCameraIP);
 
 router.delete("/:id", deleteCamera);
 
