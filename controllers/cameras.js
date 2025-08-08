@@ -18,7 +18,7 @@ const geojson = JSON.parse(fileContent);
 
 export const addCamera = async (req, res) => {
   try {
-    const { cameraType, longitude, latitude } = req.body;
+    const { cameraType, longitude, latitude, ip, login, password } = req.body;
 
     if (!longitude || !latitude) {
       return res.status(400).json("Необходимы координаты.");
@@ -44,6 +44,9 @@ export const addCamera = async (req, res) => {
       district,
       mahalla: mahalla_no,
       position: [longitude, latitude],
+      ip: ip,
+      login: login,
+      password: password
     });
 
     await newCamera.save();

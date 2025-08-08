@@ -28,6 +28,12 @@ const cameraSchema = new mongoose.Schema(
     ip: {
       type: String,
     },
+    login: {
+      type: String,
+    },
+    password: {
+      type: String,
+    }
   },
   { timestamps: true }
 );
